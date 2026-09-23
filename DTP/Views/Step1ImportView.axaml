@@ -1,0 +1,132 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DTP.ViewModels"
+             x:DataType="vm:Step1ImportViewModel"
+             x:Class="DTP.Views.Step1ImportView">
+
+<Grid RowDefinitions="Auto, Auto, *" Margin="8">
+        
+        <!-- Aktionsleiste -->
+        <Border Background="#242424" CornerRadius="4" Margin="0 0 0 8" BoxShadow="0 0 2 0 #000000">
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8">
+                <Button Content="Dateien laden / hinzufügen" Command="{Binding LoadDataCommand}" 
+                        Background="Transparent" Foreground="White" CornerRadius="4" Padding="12,6" FontSize="12" FontWeight="Bold"/>
+            
+                <Button Content="Tabelle leeren" Command="{Binding ClearDataCommand}" 
+                        Background="Transparent" Foreground="White" CornerRadius="4" Padding="12,6" FontSize="12"/>
+            
+                <Button Content="Duplikate löschen" Command="{Binding RemoveDuplicatesCommand}" 
+                        Background="Transparent" Foreground="White" CornerRadius="4" Padding="12,6" FontSize="12"/>
+                <Button Content="Sortieren" Command="{Binding SortDataCommand}"
+                        Background="Transparent" Foreground="White" CornerRadius="4" Padding="12,6" FontSize="12"/>
+                <Border Width="1" Background="#444" Margin="5,0"/>
+            
+                <Button Content="Neue Zeile" Command="{Binding AddRowCommand}" 
+                        Background="Transparent" Foreground="White" CornerRadius="4" Padding="12,6" FontSize="12" FontWeight="Bold"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Hinweis -->
+        <TextBlock Grid.Row="1" Text="Tabelle: (Rechtsklick oder 'Entf' zum Löschen einzelner Zeilen)" 
+                   Foreground="Gray" FontSize="11" Margin="0,0,0,5"/>
+
+        <!-- Daten-Tabelle -->
+        <Border Grid.Row="2" Background="Transparent" CornerRadius="4" BoxShadow="0 0 2 0 #000000" ClipToBounds="False">
+            
+            <DataGrid ItemsSource="{Binding RawData}" SelectedItem="{Binding SelectedRow}"
+                      AutoGenerateColumns="False" IsReadOnly="False"
+                      GridLinesVisibility="All" CornerRadius="4" 
+                      Background="Transparent" RowBackground="#1E1E1E">
+            
+                <DataGrid.Styles>
+                    <Style Selector="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#242424"/>
+                        <Setter Property="Foreground" Value="#FFFFFF"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="CornerRadius" Value="4"/>
+                    </Style>
+                </DataGrid.Styles>
+
+                <!-- Kontextmenü (Rechtsklick) -->
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Zeile löschen" Command="{Binding DeleteRowCommand}" InputGesture="Delete" />
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+
+                <!-- Hotkey (Entf-Taste) -->
+                <DataGrid.KeyBindings>
+                    <KeyBinding Gesture="Delete" Command="{Binding DeleteRowCommand}"/>
+                </DataGrid.KeyBindings>
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Teilebezeichnung" Binding="{Binding Teilebezeichnung}" Width="*"/>
+                    <DataGridTextColumn Header="Seriennummer" Binding="{Binding Seriennummer}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <!-- Overlay Importer -->
+        <Border Grid.RowSpan="3" Background="#B3000000" IsVisible="{Binding IsPreviewOverlayVisible}" ZIndex="100">
+            
+            <Border Background="#1A1A1A" CornerRadius="8" Width="850" Height="550"
+                    BoxShadow="0 10 30 0 #000000" VerticalAlignment="Center" HorizontalAlignment="Center">
+                
+                <Grid RowDefinitions="Auto, Auto, *, Auto" Margin="20">
+                    
+                    <TextBlock Grid.Row="0" Text="Spaltenzuweisung &amp; Vorschau" Foreground="#2196F3" FontWeight="Bold" FontSize="16" Margin="0,0,0,15"/>
+
+                    <!-- Einstellungen -->
+                    <Border Grid.Row="1" Background="#242424" Padding="12,0" Margin="0,0,0,10" CornerRadius="4">
+                        <StackPanel Orientation="Horizontal" Spacing="20" VerticalAlignment="Center">
+
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <TextBlock Text="Bezeichnung:" Foreground="Gray" VerticalAlignment="Center" FontSize="12"/>
+                                <ComboBox ItemsSource="{Binding ColumnNames}" SelectedIndex="{Binding SelectedBezIndex}" Width="130" MinHeight="24" Height="24" CornerRadius="4" FontSize="12" BorderThickness="0"/>
+                            </StackPanel>
+                            
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <TextBlock Text="Seriennummer:" Foreground="Gray" VerticalAlignment="Center" FontSize="12"/>
+                                <ComboBox ItemsSource="{Binding ColumnNames}" SelectedIndex="{Binding SelectedSnIndex}" Width="130" MinHeight="24" Height="24" CornerRadius="4" FontSize="12" BorderThickness="0"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Vorschau-Tabelle -->
+                    <Border Grid.Row="2" Background="Transparent" CornerRadius="4" Margin="0,0,0,15" ClipToBounds="False">
+                        
+                        <DataGrid x:Name="PreviewGrid" ItemsSource="{Binding PreviewData}" AutoGenerateColumns="False" 
+                                  Background="Transparent" RowBackground="#1E1E1E" GridLinesVisibility="All" CornerRadius="4">
+                            
+                            <DataGrid.Styles>
+                                <Style Selector="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="#242424"/>
+                                    <Setter Property="Foreground" Value="#FFFFFF"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="CornerRadius" Value="4"/>
+                                </Style>
+                            </DataGrid.Styles>
+
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Header="Import" Width="70">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding IsIncluded}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>                                
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+
+                    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                        <Button Content="Abbrechen" Command="{Binding CancelPreviewCommand}" Background="Transparent" Foreground="White" Padding="12,6" CornerRadius="4" FontSize="12"/>
+                        <Button Content="Daten importieren" Command="{Binding ConfirmImportCommand}" Background="#4CAF50" Foreground="White" FontWeight="Bold" Padding="12,6" CornerRadius="4" FontSize="12"/>
+                    </StackPanel>
+
+                </Grid>
+            </Border>
+        </Border>
+
+    </Grid>
+</UserControl>

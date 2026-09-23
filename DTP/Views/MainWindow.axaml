@@ -1,0 +1,326 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:DTP.ViewModels"
+        x:DataType="vm:MainWindowViewModel"
+        x:Class="DTP.Views.MainWindow"
+        Title=""
+        Width="1280" Height="720"
+        MinWidth="1280" MinHeight="720"
+        Background="#1A1A1A"
+        WindowStartupLocation="CenterScreen"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="40">
+
+    <Grid RowDefinitions="40, *, Auto">
+        
+        <Border Grid.Row="0" Background="#1A1A1A" IsHitTestVisible="False"/>
+
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, Auto, *">
+            
+            <!-- Logo / Name -->
+            <TextBlock Grid.Column="0" Text="DTP" Foreground="#2196F3" FontWeight="Bold" FontSize="14" 
+                       VerticalAlignment="Top" Margin="15 7 0 0" IsHitTestVisible="False"/>
+            <TextBlock Grid.Column="0" Text="1.1" Foreground="#1A78C2" FontWeight="Bold" FontSize="10" 
+                       VerticalAlignment="Top" Margin="48 7 5 0" IsHitTestVisible="False"/>
+            <!-- Menü -->
+            <Menu Grid.Column="1" VerticalAlignment="Top" Height="30">
+                <MenuItem Header="Datei" FontSize="12" >
+                    <MenuItem Header="Configuration Speichern" Command="{Binding SaveConfigCommand}"/>
+                    <MenuItem Header="Beenden" Command="{Binding ExitAppCommand}"/>
+                </MenuItem>
+                
+                <MenuItem Header="Einstellungen" FontSize="12" >
+                    <MenuItem Header="Metadaten" Command="{Binding OpenMetadataCommand}"/>
+                </MenuItem>
+                
+                <MenuItem Header="Hilfe" FontSize="12">
+                    <MenuItem Header="Platzhalter-Handbuch" Command="{Binding OpenHelpCommand}"/>
+                    <MenuItem Header="Log" Command="{Binding OpenLogCommand}"/>
+                    <MenuItem Header="Info über DTP" Command="{Binding OpenInfoCommand}"/>
+                </MenuItem>
+            </Menu>
+        </Grid>
+
+        <!-- Hauptbereich                  -->
+        <Border Grid.Row="1">
+            <Grid RowDefinitions="Auto, *">
+
+                <Border Background="#242424" CornerRadius="4" Padding="12,6" Margin="8 0 8 4" BoxShadow="0 0 2 0 #000000">
+                    <TextBlock Grid.Row="0" Text="{Binding StepTitle}" FontSize="12" FontWeight="Bold" Foreground="White"/>
+                </Border>
+
+                <TransitioningContentControl Grid.Row="1" Content="{Binding CurrentPage}">
+                    <TransitioningContentControl.PageTransition>
+                        <CrossFade Duration="0:0:0.25" />
+                    </TransitioningContentControl.PageTransition>
+                </TransitioningContentControl>     
+            </Grid>
+        </Border>
+
+        <!-- Footer (Navigation) -->
+        <Border Grid.Row="2" Background="#1E1E1E" Padding="4,4">
+            <Grid ColumnDefinitions="Auto, *, Auto">
+                
+                <Button Grid.Column="0" Content="Zurück" Command="{Binding GoBackCommand}" FontSize="10"
+                        Background="Transparent" Foreground="White" CornerRadius="4" Padding="12,6" FontWeight="Bold"
+                        IsVisible="{Binding CanGoBack}"/>
+                <Button Grid.Column="2" Content="Weiter" Command="{Binding GoNextCommand}" FontSize="10"
+                        Background="Transparent" Foreground="White" CornerRadius="4" Padding="12,6" FontWeight="Bold"
+                        IsVisible="{Binding CanGoNext}"/>
+                
+            </Grid>
+        </Border>
+
+        <!-- Metadaten-Manager             -->
+        <Border Grid.Row="1" Grid.RowSpan="2" 
+                Background="#B3000000" 
+                IsVisible="{Binding IsMetadataOverlayVisible}" 
+                ZIndex="100">
+            
+            <Border Background="#1A1A1A" CornerRadius="8" Width="700" Height="500" 
+                    BoxShadow="0 10 30 0 #000000" VerticalAlignment="Center" HorizontalAlignment="Center">
+                
+                <Grid RowDefinitions="Auto, *, Auto, Auto" Margin="20">
+
+                    <TextBlock Grid.Row="0" Text="Metadaten-Felder verwalten" Foreground="#2196F3" FontSize="16" FontWeight="Bold" Margin="0,0,0,15"/>
+                    
+                    <Grid Grid.Row="1" ColumnDefinitions="*, 20, *">
+                        
+                        <Border Grid.Column="0" Background="#242424" CornerRadius="4" Padding="10">
+                            <Grid RowDefinitions="Auto, Auto, *, Auto">
+                                <TextBlock Grid.Row="0" Text="Globale Zusatzfelder:" Foreground="White" FontWeight="Bold" Margin="0,0,0,10"/>
+                                
+                                <Grid Grid.Row="1" ColumnDefinitions="*, Auto" Margin="0,0,0,10">
+                                    <TextBox Grid.Column="0" Text="{Binding NewGlobalName}" Watermark="Feldname (z.B. Abteilung)" Height="28" CornerRadius="4,0,0,4" BorderThickness="0"/>
+                                    <Button Grid.Column="1" Command="{Binding AddGlobalFieldCommand}" Content="+" Background="#0078D7" Foreground="White" Width="30" CornerRadius="0,4,4,0"/>
+                                </Grid>
+                                
+                                <ListBox Grid.Row="2" ItemsSource="{Binding CustomGlobals}" SelectedItem="{Binding SelectedGlobalItem}" 
+                                         Background="#1E1E1E" CornerRadius="4" BorderThickness="1" BorderBrush="#333"/>
+
+                                <Button Grid.Row="3" Command="{Binding RemoveGlobalFieldCommand}" Content="Ausgewähltes löschen" 
+                                        Background="#333" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,10,0,0"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Column="2" Background="#242424" CornerRadius="4" Padding="10">
+                            <Grid RowDefinitions="Auto, Auto, *, Auto">
+                                <TextBlock Grid.Row="0" Text="Zusatzfelder pro Auftrag:" Foreground="White" FontWeight="Bold" Margin="0,0,0,10"/>
+                                
+                                <Grid Grid.Row="1" ColumnDefinitions="*, Auto" Margin="0,0,0,10">
+                                    <TextBox Grid.Column="0" Text="{Binding NewLocalName}" Watermark="Feldname (z.B. RückmeldeNr)" Height="28" CornerRadius="4,0,0,4" BorderThickness="0"/>
+                                    <Button Grid.Column="1" Command="{Binding AddLocalFieldCommand}" Content="+" Background="#0078D7" Foreground="White" Width="30" CornerRadius="0,4,4,0"/>
+                                </Grid>
+
+                                <ListBox Grid.Row="2" ItemsSource="{Binding CustomLocals}" SelectedItem="{Binding SelectedLocalItem}" 
+                                         Background="#1E1E1E" CornerRadius="4" BorderThickness="1" BorderBrush="#333"/>
+
+                                <Button Grid.Row="3" Command="{Binding RemoveLocalFieldCommand}" Content="Ausgewähltes löschen" 
+                                        Background="#333" Foreground="White" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,10,0,0"/>
+                            </Grid>
+                        </Border>
+                    </Grid>
+
+                    <CheckBox Grid.Row="2" IsChecked="{Binding SaveMetadataPermanently}" Content="Diese Felder dauerhaft für zukünftige Starts speichern (dtp_config.json)" 
+                              Foreground="White" FontWeight="Bold" Margin="0,15,0,0"/>
+                    
+                    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,15,0,0">
+                        <Button Content="Abbrechen" Command="{Binding CloseMetadataOverlayCommand}" Background="Transparent" Foreground="White" Padding="12,6" FontSize="12" CornerRadius="4"/>
+                        <Button Content="Übernehmen &amp; Schließen" Command="{Binding SaveAndCloseMetadataCommand}" Background="#4CAF50" Foreground="White" Padding="12,6" FontSize="12" CornerRadius="4"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Border>
+
+        <!-- Info Panel                    -->
+        <Border Grid.Row="1" Grid.RowSpan="2" 
+                Background="#B3000000" 
+                IsVisible="{Binding IsInfoOverlayVisible}" 
+                ZIndex="400">
+            
+            <Border Background="#1A1A1A" CornerRadius="8" Width="700" Height="500" 
+                    BoxShadow="0 10 30 0 #000000" VerticalAlignment="Center" HorizontalAlignment="Center">
+                
+                <Grid RowDefinitions="Auto, *, Auto" Margin="16">
+                    
+                    <StackPanel Grid.Row="0" Margin="0,0,0,15">
+                        <TextBlock Text="Über DTP (Daten Transfer Programm)" Foreground="#2196F3" FontSize="20" FontWeight="Bold"/>
+                        <TextBlock Text="Version 1.1 (P1 2026)" Foreground="Gray" FontSize="12"/>
+                        <TextBlock Text="Entwickelt von Tim Huke" Foreground="Gray" FontSize="12"/>
+                    </StackPanel>
+                    
+                    <Border Grid.Row="1" Background="#242424" CornerRadius="4" Padding="5">
+                        <TabControl>
+                           
+                           <TabItem Header="Allgemein" FontSize="12">
+                               <ScrollViewer Padding="10">
+                                   <StackPanel Spacing="10">
+                                       <TextBlock Text="Was ist DTP" Foreground="#2196F3" FontWeight="Bold"/>
+                                       <TextBlock Text="Das Daten Transfer Programm (DTP) ist ein Software-Tool zur Automatisierung der Dokumentengenerierung. Es nimmt Rohdaten (z. B. aus ERP-Exporten wie CSV- oder TXT-Dateien), bündelt zusammengehörige Bauteile und Seriennummern zu logischen Auftrags-Sets und fügt diese vollautomatisch in vordefinierte Word- (.docx) und Excel-Vorlagen (.xlsx) ein." Foreground="White" TextWrapping="Wrap"/>
+
+                                       <Border Height="1" Background="#444" Margin="0,10"/>
+                                        
+                                       <TextBlock Text="Entwicklung" Foreground="#2196F3" FontWeight="Bold"/>
+                                       <TextBlock Text="Dieses Programm wurde im Rahmen eines Arbeitsverbesserungsvorschlags (AVV) entwickelt, um die Set-Bildung und Dokumentengenerierung zu automatisieren." Foreground="White" TextWrapping="Wrap"/>
+                                       <TextBlock Text="Das Konzept, die Ausarbeitung sowie die gesamte Entwicklung geschah und wird weiterhin in der (privaten) Freizeit erfolgen, teils unter Inanspruchnahme moderner AI-Assistenzsysteme." Foreground="White" TextWrapping="Wrap"/>
+
+                                       <Border Height="1" Background="#444" Margin="0,10"/>
+                                        
+                                       <TextBlock Text="Verwendete Open-Source Software (Drittanbieter):" Foreground="#4CAF50" FontWeight="Bold" FontSize="13"/>
+                                       <StackPanel Spacing="5" Margin="10,0,0,0">
+                                           <TextBlock Text="• Avalonia UI (MIT License) - © The Avalonia Project" Foreground="LightGray" FontSize="11"/>
+                                           <TextBlock Text="• CommunityToolkit.Mvvm (MIT License) - © .NET Foundation" Foreground="LightGray" FontSize="11"/>
+                                           <TextBlock Text="• CsvHelper (MS-PL / Apache 2.0) - © Josh Close" Foreground="LightGray" FontSize="11"/>
+                                           <TextBlock Text="• MiniWord (Apache 2.0 License) - © MiniSoftware" Foreground="LightGray" FontSize="11"/>
+                                           <TextBlock Text="• MiniExcel (Apache 2.0 License) - © MiniSoftware" Foreground="LightGray" FontSize="11"/>
+                                       </StackPanel>
+
+                                       <TextBlock Text="Die Quellcodes und vollständigen Lizenztexte der jeweiligen Bibliotheken sind auf den entsprechenden GitHub-Seiten der Projekte oder via NuGet einsehbar." Foreground="Gray" FontSize="10" TextWrapping="Wrap" Margin="0,10,0,0"/>
+                                   </StackPanel>
+                               </ScrollViewer>
+                           </TabItem>
+                           
+                           <TabItem Header="Patchnotes" FontSize="12">
+                               <ScrollViewer Padding="10">
+                                   <StackPanel Spacing="10">
+                                       <TextBlock Text="Update 1.1 (Template-Engine Update)" Foreground="#4CAF50" FontWeight="Bold" FontSize="16"/>
+                                       <TextBlock Text="• Core: 'Globale Dokumente' implementiert. Erzeugt ein einmaliges Master-Dokument über alle Aufträge hinweg." Foreground="White" TextWrapping="Wrap"/>
+                                       <TextBlock Text="• Core: Dynamische globale Zähler hinzugefügt (Gesamt_Auftraege, Summe_Bauteilname)." Foreground="White" TextWrapping="Wrap"/>
+                                       <TextBlock Text="• Core: Dateisperr-Schutz integriert. Vorlagen und Master-Dokumente umgehen Lock-Fehler via Temp-Ordner und Counter-Benennung." Foreground="White" TextWrapping="Wrap"/>
+                                       <TextBlock Text="• UI: Rohdaten-Liste (Schritt 1) kann nun alphabetisch und numerisch sortiert werden." Foreground="White" TextWrapping="Wrap"/>
+                                       <TextBlock Text="• UI: Handbuch um Globale-Syntax erweitert und Info-Panel auf Tabs umgestellt." Foreground="White" TextWrapping="Wrap"/>
+                                       
+                                       <Border Height="1" Background="#444" Margin="0,10"/>
+
+                                       <TextBlock Text="Update 1.0 (Release Candidate)" Foreground="Gray" FontWeight="Bold" FontSize="16"/>
+                                       <TextBlock Text="• Export: Drag &amp; Drop für Word/Excel Vorlagen (Multi-File)." Foreground="DarkGray" TextWrapping="Wrap"/>
+                                       <TextBlock Text="• Export: Config-Save System implementiert." Foreground="DarkGray" TextWrapping="Wrap"/>
+                                       <TextBlock Text="• Import: CSV/TXT Drag &amp; Drop implementiert." Foreground="DarkGray" TextWrapping="Wrap"/>
+                                       <TextBlock Text="• Core: 3-State Farbsystem für Platzhalter." Foreground="DarkGray" TextWrapping="Wrap"/>
+                                   </StackPanel>
+                               </ScrollViewer>
+                           </TabItem>
+                           
+                        </TabControl>
+                    </Border>
+                    
+                    <Button Grid.Row="2" Content="Schließen" Command="{Binding CloseInfoOverlayCommand}" 
+                            Background="#0078D7" Foreground="White" 
+                            HorizontalAlignment="Right" Padding="12,6" FontSize="12" CornerRadius="4" Margin="0,20,0,0"/>
+                </Grid>
+            </Border>
+        </Border>
+
+        <!-- Log                         -->
+        <Border Grid.Row="1" Grid.RowSpan="2" 
+                Background="#B3000000" 
+                IsVisible="{Binding IsLogOverlayVisible}"
+                ZIndex="300">
+            
+            <Border Background="#1A1A1A" CornerRadius="8" Width="700" Height="500"
+                    BoxShadow="0 10 30 0 #000000" VerticalAlignment="Center" HorizontalAlignment="Center">
+                
+                <Grid RowDefinitions="Auto, *, Auto" Margin="20">
+
+                    <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="0,0,0,15">
+                        <TextBlock Grid.Column="0" Text="System-Logbuch" Foreground="#2196F3" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Content="Logbuch leeren" Command="{Binding ClearLogCommand}" Background="#333" Foreground="White" FontSize="11" Padding="12,6" CornerRadius="4"/>
+                    </Grid>
+                    
+                    <Border Grid.Row="1" Background="#0C0C0C" CornerRadius="4" BorderBrush="#333" BorderThickness="1" Padding="5">
+                        <ScrollViewer>
+                            <ItemsControl ItemsSource="{Binding LogHistory}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" Foreground="#A8CC8C" FontFamily="Consolas, Courier New, Monospace" FontSize="12" Margin="4,2" TextWrapping="Wrap"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+                    
+                    <Button Grid.Row="2" Content="Schließen" Command="{Binding CloseLogOverlayCommand}" 
+                            Background="#0078D7" Foreground="White" FontWeight="Bold" 
+                            HorizontalAlignment="Right" Padding="12,6" FontSize="12" CornerRadius="4" Margin="0,15,0,0"/>
+                </Grid>
+            </Border>
+        </Border>
+
+        <!-- Help / Handbuch -->
+        <Border Grid.Row="1" Grid.RowSpan="2" 
+                Background="#B3000000" 
+                IsVisible="{Binding IsHelpOverlayVisible}" 
+                ZIndex="400">
+            
+            <Border Background="#1A1A1A" CornerRadius="8" Width="700" Height="500" 
+                    BoxShadow="0 10 30 0 #000000" VerticalAlignment="Center" HorizontalAlignment="Center">
+                
+                <Grid RowDefinitions="Auto, *, Auto" Margin="25">
+                    
+                    <StackPanel Grid.Row="0" Margin="0,0,0,15">
+                        <TextBlock Text="Platzhalter-Handbuch" Foreground="#2196F3" FontSize="20" FontWeight="Bold"/>
+                        <TextBlock Text="So verwendest du Teile, Seriennummern und Zähler in Word/Excel" Foreground="Gray" FontSize="12"/>
+                    </StackPanel>
+                    
+                    <Border Grid.Row="1" Background="#242424" CornerRadius="4" Padding="15">
+                        <ScrollViewer>
+                            <StackPanel Spacing="15">
+                        
+                                <TextBlock Text="1. Normale Dokumente (Ein Bericht pro Auftrag)" Foreground="#2196F3" FontWeight="Bold" FontSize="15"/>
+                                <TextBlock Text="Beispiel: Ein Teil namens 'Produkt' hat 3 Seriennummern." Foreground="White" FontSize="12"/>
+                                
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="• Nur die erste Seriennummer" Foreground="#4CAF50" FontWeight="Bold" FontSize="13"/>
+                                    <TextBlock Text="{}{{ Produkt }}" FontFamily="Consolas" Foreground="#FFC107"/>
+                                    <TextBlock Text="Ausgabe: SN-101 (Die erste Nummer. Ideal, wenn eh nur 1 Teil bestellt wurde)" Foreground="Gray" FontSize="12"/>
+                                </StackPanel>
+
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="• Einzelne Nummern gezielt ansprechen (Für Listen &amp; Tabellen)" Foreground="#4CAF50" FontWeight="Bold" FontSize="13"/>
+                                    <TextBlock Text="{}{{ Produkt_1 }}, {{ Produkt_2 }}, {{ Produkt_3 }}" FontFamily="Consolas" Foreground="#FFC107"/>
+                                    <TextBlock Text="Ausgabe: SN-101 (Zelle 1), SN-102 (Zelle 2) usw." Foreground="Gray" FontSize="12"/>
+                                    <TextBlock Text="Tipp: Bau dir deine Listen in Word/Excel einfach fest auf (z.B. 10 Zeilen). Platzhalter ohne hinterlegte Seriennummer bleiben leer!" Foreground="White" FontSize="11" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                </StackPanel>
+
+                                <Border Height="1" Background="#444" Margin="0,5"/>
+
+                                <TextBlock Text="2. Globale Dokumente (Eine Übersicht für ALLE Aufträge)" Foreground="#2196F3" FontWeight="Bold" FontSize="15"/>
+                                <TextBlock Text="Voraussetzung: Der Haken 'Globales Dokument' muss bei der Vorlage gesetzt sein!" Foreground="#FF9800" FontSize="12" FontWeight="Bold"/>
+                        
+                                <StackPanel Spacing="3" Margin="0,5,0,0">
+                                    <TextBlock Text="• Zähler und Summen" Foreground="#4CAF50" FontWeight="Bold" FontSize="13"/>
+                                    <TextBlock Text="{}{{ Gesamt_Auftraege }} oder {{ Summe_Produkt }}" FontFamily="Consolas" Foreground="#FFC107"/>
+                                    <TextBlock Text="Ausgabe: 5 (Aufträge) oder 15 (Gesamtanzahl aller 'Produkte' aus allen Aufträgen)" Foreground="Gray" FontSize="12"/>
+                                </StackPanel>
+
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="• Auftrags-Metadaten abrufen" Foreground="#4CAF50" FontWeight="Bold" FontSize="13"/>
+                                    <TextBlock Text="{}{{ Auftrag_1_Datum }} oder {{ Auftrag_2_Nutzer }}" FontFamily="Consolas" Foreground="#FFC107"/>
+                                    <TextBlock Text="Ausgabe: Das Datum aus dem 1. Auftrag, oder der Nutzer aus dem 2. Auftrag." Foreground="Gray" FontSize="12"/>
+                                </StackPanel>
+
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="• Seriennummern auftragsübergreifend abrufen" Foreground="#4CAF50" FontWeight="Bold" FontSize="13"/>
+                                    <TextBlock Text="{}{{ Produkt_1_2 }}" FontFamily="Consolas" Foreground="#FFC107"/>
+                                    <TextBlock Text="Logik: {Bauteilname}_{Seriennummer-Position}_{Auftrags-Position}" Foreground="LightGray" FontSize="11"/>
+                                    <TextBlock Text="Ausgabe: Die 1. Seriennummer des Teils 'Produkt' aus dem 2. Auftrag." Foreground="Gray" FontSize="12"/>
+                                </StackPanel>
+
+                                <Border Height="1" Background="#444" Margin="0,5"/>
+
+                                <TextBlock Text="Wichtiger Hinweis zu Sonderzeichen:" Foreground="#F44336" FontWeight="Bold" FontSize="12"/>
+                                <TextBlock Text="Wenn dein Teil Leerzeichen, Bindestriche oder Punkte enthält (z.B. 'Kabel Mat'), wird daraus intern ein Unterstrich. Du musst dann {{ Kabel_Mat_1 }} schreiben!" 
+                                           Foreground="LightGray" TextWrapping="Wrap" FontSize="11"/>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                    
+                    <Button Grid.Row="2" Content="Verstanden" Command="{Binding CloseHelpOverlayCommand}" 
+                            Background="#0078D7" Foreground="White" FontWeight="Bold" 
+                            HorizontalAlignment="Right" Padding="12,6" FontSize="12" CornerRadius="4" Margin="0,20,0,0"/>
+                </Grid>
+            </Border>
+        </Border>
+
+    </Grid>
+</Window>

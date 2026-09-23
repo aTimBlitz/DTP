@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DTP.ViewModels"
+             x:DataType="vm:Step2SetupViewModel"
+             x:Class="DTP.Views.Step2SetupView">
+
+    <Grid RowDefinitions="Auto, Auto, *" Margin="8">
+        
+        <!-- Globale einstellungen -->
+        <Border Grid.Row="0" Background="#242424" CornerRadius="4" Padding="10,0" Margin="0,0,0,8" BoxShadow="0 0 2 0 #000000">
+            <WrapPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal" Spacing="15" VerticalAlignment="Center">
+                    <TextBlock Text="Anzahl Aufträge:" Foreground="White" FontWeight="Bold" VerticalAlignment="Center" FontSize="12" Padding="0,7"/>
+                    <NumericUpDown Value="{Binding TargetPackageCount}" Minimum="1" Maximum="100" Width="140" MinHeight="24" Height="24" FontSize="12" BorderThickness="0"/>
+                </StackPanel>
+                
+                <Border Width="1" Background="#444" Margin="12,0"/>
+
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="0,0,20,0">
+                    <TextBlock Text="Nutzer:" Foreground="Gray" VerticalAlignment="Center" FontSize="12"/>
+                    <TextBox Text="{Binding UserTag}" Width="100" Height="24" MinHeight="24" VerticalContentAlignment="Center" FontSize="12" CornerRadius="4" BorderThickness="0" Padding="6,2" />
+                </StackPanel>
+                
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="0,0,20,0">
+                    <TextBlock Text="Datum:" Foreground="Gray" VerticalAlignment="Center" FontSize="12"/>
+                    <TextBox Text="{Binding TargetDate}" Width="100" Height="24" MinHeight="24" VerticalContentAlignment="Center" FontSize="12" CornerRadius="4" BorderThickness="0" Padding="6,2" />
+                </StackPanel>
+
+                <ItemsControl ItemsSource="{Binding CustomGlobalValues}" VerticalAlignment="Center">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="0,0,20,0">
+                                <TextBlock Text="{Binding Key, StringFormat='{}{0}:'}" Foreground="Gray" VerticalAlignment="Center" FontSize="12"/>
+                                <TextBox Text="{Binding Value}" Width="100" Height="24" MinHeight="24" VerticalContentAlignment="Center" FontSize="12" CornerRadius="4" BorderThickness="0" Padding="6,2" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+            </WrapPanel>
+        </Border>
+
+        <!-- Teile Verteilung -->
+        <Border Grid.Row="2" Background="Transparent" CornerRadius="4" BoxShadow="0 0 2 0 #000000" ClipToBounds="False">
+            <DataGrid ItemsSource="{Binding PartDistributions}"
+                      AutoGenerateColumns="False" IsReadOnly="False"
+                      GridLinesVisibility="All" CornerRadius="4" 
+                      Background="Transparent" RowBackground="#1E1E1E">
+                <DataGrid.Styles>
+                    <Style Selector="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#242424"/>
+                        <Setter Property="Foreground" Value="#FFFFFF"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="CornerRadius" Value="4"/>
+                    </Style>
+                </DataGrid.Styles>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Teilebezeichnung" Binding="{Binding Teilebezeichnung}" IsReadOnly="True" Width="*"/>
+                    <DataGridTextColumn Header="Gesamt" Binding="{Binding GesamtStueck}" IsReadOnly="True" Width="150"/>
+                    <DataGridTextColumn Header="Stück pro Auftrag" Binding="{Binding ItemsPerPackage}" IsReadOnly="False" Width="160"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+    </Grid>
+</UserControl>
